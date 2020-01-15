@@ -2,9 +2,21 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Creature : MonoBehaviour
+public class Creature : PhysicsAffectableObject
 {
+    [Header("CreatureSetting")]
+    public SpriteRenderer renderer;
+
+    [Header("CreatureStatus")]
     protected float _hp = 10f;
+    protected float HP
+    {
+        get { return _hp; }
+        set
+        {
+            _hp = value;
+        }
+    }
     protected float _atk = 1f;
     protected float _spd = 3f;
 
@@ -12,31 +24,45 @@ public class Creature : MonoBehaviour
     protected float _curAtk;
     protected float _curSpd;
 
+
     protected virtual void Move(Vector2 moveVec)
     {
-        transform.Translate(moveVec * MyTime.deltaTime * _curSpd);
+        renderer.flipX = moveVec.x < 0f;
+
+        transform.Translate(moveVec * MyTime.deltaTime * timeScale * _curSpd);
     }
 
-    protected bool _isJumpable = false;
-    protected void Jump()
+    protected virtual void Jump(float vel = 5f)
     {
-
+        if (velocity == Vector2.zero)
+        {
+            Vector2 vec = new Vector2(0f, vel);
+            AddVelocity(vec);
+        }
     }
 
-    protected virtual void Start()
+    protected override void Start()
     {
+        base.Start();
         Init();
     }
 
-    protected virtual void Update()
+    protected override void Update()
     {
-
+        base.Update();
     }
 
-    public void Init()
+    public override void Init()
     {
+        base.Init();
+
         _curHp = _hp;
         _curAtk = _atk;
         _curSpd = _spd;
+    }
+
+    public virtual void GetDamage(float damage)
+    {
+        HP -= damage;
     }
 }

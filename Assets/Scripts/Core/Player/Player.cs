@@ -13,8 +13,15 @@ public class Player : Creature
         Move(moveVec);
     }
 
+    private void Jump()
+    {
+        if (Input.GetKey(KeyCode.W)) base.Jump();
+    }
+
     protected override void Update()
     {
+        base.Update();
+
         Move();
         Jump();
     }
