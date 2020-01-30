@@ -38,9 +38,9 @@ public class Pattern : MonoBehaviour
     //공격 판정 때는 콜라이더 활성화, 아닐 때는 비활성화
     public Monster monster;
 
-    public Attack attackPrefab;     
+    public Attack attackPrefab;      //투사체 여러 발일 경우 1. 한 패턴으로 처리 2. 여러 패턴으로 처리
     public AttackType attackType;
-    public ShootType shootType;     //지금 문제 있음 (밀리 시에도 보임)
+    //public ShootType shootType;     //지금 문제 있음 (밀리 시에도 보임)
     public bool defendable;
     public float preDelay;
     public float postDelay;
@@ -54,28 +54,47 @@ public class Pattern : MonoBehaviour
 
     public bool isPatternPlaying = false;   //얘는 감추는 게 좋을 듯
 
+    private void OnEnable()
+    {
+        attackPrefab.gameObject.SetActive(false);
+    }
+
     public void PatternPlay()
+    {
+        //얘 고쳐야 함
+        //Attack attack = Instantiate(attackPrefab, monster.transform.position + (Vector3)attackOffset, Quaternion.identity) as Attack;
+        //attack.Init(duration, damage, defendable);
+
+        StartCoroutine(PatternRoutine());
+    }
+
+    private IEnumerator PatternRoutine()
     {
         isPatternPlaying = true;
 
-        //얘 고쳐야 함
-        Attack attack = Instantiate(attackPrefab, monster.transform.position + (Vector3)attackOffset, Quaternion.identity) as Attack;
-        attack.Init(duration, damage, defendable);
+        yield return new WaitForSeconds(preDelay);
 
-        StartCoroutine(AnimationPlay());
-    }
+        float timer = duration;
 
-    private IEnumerator AnimationPlay()
-    {
+        attackPrefab.gameObject.SetActive(true);
+
         SpriteRenderer renderer = monster.GetComponent<SpriteRenderer>();
         foreach (var anim in spriteAnimation)
         {
             renderer.sprite = anim.sprite;
 
             yield return new WaitForSeconds(anim.duration);
+
+            timer -= anim.duration;
         }
 
+        yield return new WaitForSeconds(timer);     //혹시 애니메이션 지속시간이랑 공격 지속 시간이 다를 경우
+
+        yield return new WaitForSeconds(postDelay);
+
         isPatternPlaying = false;
+
+        //몬스터에서 Idle로 전환해줘야 함
     }
 }
 
@@ -87,9 +106,25 @@ public class PatternEditor : Editor
         base.OnInspectorGUI();
         var pattern = target as Pattern;
 
-        if (pattern.attackType == AttackType.Ranged)
-            pattern.shootType = (ShootType)EditorGUILayout.EnumPopup("  Shoot Type", pattern.shootType);
+        //이거에 맞춰서 패턴을 재구성해야함
+        if (GUILayout.Button("Apply"))
+        {
+            if (pattern.attackPrefab != null)
+                DestroyImmediate(pattern.attackPrefab.gameObject);
 
+            GameObject prefab = null;
+            if (pattern.attackType == AttackType.Melee)
+            {
+                prefab = Resources.Load("Prefabs/AttackPrefab") as GameObject;
+            }
+            Attack attack = Instantiate(prefab).GetComponent<Attack>();
+            attack.transform.parent = pattern.transform;
+            attack.transform.position = pattern.transform.position + (Vector3)pattern.attackOffset;
+            attack.transform.localScale = pattern.attackSize;
+
+            pattern.attackPrefab = attack;
+            pattern.attackPrefab.Init(pattern.duration, pattern.damage, pattern.defendable);
+        }
     }
 }
 

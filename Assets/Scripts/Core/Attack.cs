@@ -4,47 +4,56 @@ using UnityEngine;
 
 public class Attack : MonoBehaviour
 {
+    [SerializeField]
     private float _damage;
+    [SerializeField]
     private bool _defendable;
+    [SerializeField]
+    private float _duration;
 
     // Start is called before the first frame update
-    private void Start()
+    public virtual void Start()
     {
         Init();
     }
 
-    public void Init()
+    public virtual void Init()
     {
         gameObject.layer = LayerMask.NameToLayer("NonPhysicalAffectable");
     }
 
-    public void Init(float duration, float damage, bool defendable)
+    //Attack Sprite, Animation도 받아야 함
+    public virtual void Init(float duration, float damage, bool defendable)
     {
+        _duration = duration;
         _damage = damage;
         _defendable = defendable;
-
-        StartCoroutine(AttackRoutine(duration));
     }
 
-    private IEnumerator AttackRoutine(float duration)
+    public virtual void OnEnable()
+    {
+        StartCoroutine(AttackRoutine(_duration));
+    }
+
+    protected virtual IEnumerator AttackRoutine(float duration)
     {
         yield return new WaitForSeconds(duration);
 
         DestroyCallback();
     }
 
-    private void DestroyCallback()
+    public virtual void DestroyCallback()
     {
         StopAllCoroutines();
-        Destroy(gameObject);
+        gameObject.SetActive(false);
     }
 
-    private void OnTriggerEnter2D(Collider2D c)
+    protected virtual void OnTriggerEnter2D(Collider2D c)
     {
         if (c.tag == "Player")
         {
             c.GetComponent<Player>().GetDamage(_damage);
-            DestroyCallback();
+            gameObject.SetActive(false);
         }
     }
 }
