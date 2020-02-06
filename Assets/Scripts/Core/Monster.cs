@@ -7,10 +7,12 @@ public class Monster : Creature
 {
     public List<Pattern> patterns = new List<Pattern>();
 
+    public bool isPatternPlaying = false;
+
     //임시
     private void Update()
     {
-        if (!patterns[0].isPatternPlaying)
+        if (!isPatternPlaying)
         {
             StartCoroutine(Routine());
         }
@@ -21,7 +23,7 @@ public class Monster : Creature
     {
         patterns[0].PatternPlay();
 
-        yield return new WaitUntil(() => !patterns[0].isPatternPlaying);
+        yield return new WaitUntil(() => !isPatternPlaying);
     }
 }
 

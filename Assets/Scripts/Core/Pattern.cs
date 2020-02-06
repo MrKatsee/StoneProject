@@ -13,6 +13,11 @@ public enum ShootType
     Direct, Homing
 }
 
+public enum PatternSpawnType
+{
+    AtMonster, AtAttack
+}
+
 [System.Serializable]
 public class SpriteAnimationEntity
 {
@@ -22,8 +27,6 @@ public class SpriteAnimationEntity
 
 public class Pattern : MonoBehaviour
 {
-    //어택타입에 따라 프리팹을 별개로 뒀을 경우
-    //어택타입을 선택한 순간, 리소스에서 자동으로 프리팹이 넣어지는 것으로 할 수 있을듯
     /*
     + 경직치? (타임 스케일 조정치)
     + 파생 공격? (폭발 등의 공격에서 파생되는 공격)
@@ -34,8 +37,6 @@ public class Pattern : MonoBehaviour
      */
     //공격 명령 - 패턴
     //공격 판정 - 어택
-    //이렇게 나누지 말고, 패턴을 역시 공격 판정으로 쓸까?
-    //공격 판정 때는 콜라이더 활성화, 아닐 때는 비활성화
     public Monster monster;
 
     public Attack attackPrefab;      //투사체 여러 발일 경우 1. 한 패턴으로 처리 2. 여러 패턴으로 처리
@@ -49,10 +50,13 @@ public class Pattern : MonoBehaviour
     public Vector2 attackOffset;    //오른쪽 방향을 기준으로 한다
     public float damage;
 
+
+
     [SerializeField]
     public List<SpriteAnimationEntity> spriteAnimation;
 
-    public bool isPatternPlaying = false;   //얘는 감추는 게 좋을 듯
+    public Pattern nextPattern;
+    public PatternSpawnType nextPatternType; //다음 패턴 공격 판정이 어디서 생길지
 
     private void OnEnable()
     {
@@ -61,18 +65,31 @@ public class Pattern : MonoBehaviour
 
     public void PatternPlay()
     {
-        //얘 고쳐야 함
-        //Attack attack = Instantiate(attackPrefab, monster.transform.position + (Vector3)attackOffset, Quaternion.identity) as Attack;
-        //attack.Init(duration, damage, defendable);
+        //일단 지금은 무조건 몬스터 기준으로 생성
+        Vector2 monsterPos = monster.transform.position;
+        Vector2 offset = Vector2.zero;
+
+        switch (monster.direction)
+        {
+            case Direction.LEFT:
+                offset = new Vector2(-attackOffset.x, attackOffset.y);
+                break;
+            case Direction.RIGHT:
+                offset = new Vector2(attackOffset.x, attackOffset.y);
+                break;
+        }
+
+        transform.GetChild(0).position = monsterPos + offset;
 
         StartCoroutine(PatternRoutine());
     }
 
     private IEnumerator PatternRoutine()
     {
-        isPatternPlaying = true;
+        monster.isPatternPlaying = true;
 
         yield return new WaitForSeconds(preDelay);
+        yield return new WaitUntil(() => monster.timeScale == 1f);
 
         float timer = duration;
 
@@ -84,17 +101,36 @@ public class Pattern : MonoBehaviour
             renderer.sprite = anim.sprite;
 
             yield return new WaitForSeconds(anim.duration);
+            yield return new WaitUntil(() => monster.timeScale == 1f);
 
             timer -= anim.duration;
         }
 
         yield return new WaitForSeconds(timer);     //혹시 애니메이션 지속시간이랑 공격 지속 시간이 다를 경우
+        yield return new WaitUntil(() => monster.timeScale == 1f);
 
         yield return new WaitForSeconds(postDelay);
+        yield return new WaitUntil(() => monster.timeScale == 1f);
 
-        isPatternPlaying = false;
-
+        NextPatternPlay();
         //몬스터에서 Idle로 전환해줘야 함
+    }
+
+    private void NextPatternPlay()
+    {
+        if (nextPattern == null)
+        {
+            monster.isPatternPlaying = false;
+            return;
+        }
+
+        switch (nextPatternType)
+        {
+            case PatternSpawnType.AtMonster:
+                nextPattern.PatternPlay();
+                break;
+        }
+
     }
 }
 

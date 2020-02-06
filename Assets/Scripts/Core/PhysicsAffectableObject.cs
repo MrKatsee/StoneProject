@@ -19,6 +19,23 @@ public class PhysicsAffectableObject : MonoBehaviour
     public Vector2 velocity = Vector2.zero;
     public float timeScale = 1f;
 
+    public void AddStun(float time)
+    {
+        if (stunRoutine != null) StopCoroutine(stunRoutine);
+
+        stunRoutine =  StartCoroutine(StunRoutine(time));
+    }
+
+    Coroutine stunRoutine;
+    private IEnumerator StunRoutine(float time)
+    {
+        timeScale = 0f;
+
+        yield return new WaitForSeconds(time);
+
+        timeScale = 1f;
+    }
+
     public void AddVelocity(Vector2 v)
     {
         velocity += v;

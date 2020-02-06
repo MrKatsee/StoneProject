@@ -11,9 +11,9 @@ GameObject:
   - component: {fileID: 3053599670690878067}
   - component: {fileID: 2359406898254144186}
   - component: {fileID: 114649569874697174}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: AttackPrefab
-  m_TagString: Untagged
+  m_TagString: MonsterAttack
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -70,3 +70,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c31e4fbd56b3744b932a05bcc9523de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  monster: {fileID: 0}
+  _damage: 0
+  _defendable: 0
+  _duration: 0

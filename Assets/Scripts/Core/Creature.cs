@@ -2,6 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum Direction
+{
+    RIGHT, LEFT
+}
+
+
 public class Creature : PhysicsAffectableObject
 {
     [Header("CreatureSetting")]
@@ -24,10 +30,28 @@ public class Creature : PhysicsAffectableObject
     protected float _curAtk;
     protected float _curSpd;
 
+    public Direction direction = Direction.RIGHT;
+    public bool movable = true;
 
     protected virtual void Move(Vector2 moveVec)
     {
-        renderer.flipX = moveVec.x < 0f;
+        if (!movable) return;
+        if (moveVec.x == 0f)
+            return;
+
+        bool isDirectionLeft = moveVec.x < 0f;
+
+        switch (isDirectionLeft)
+        {
+            case true:
+                direction = Direction.LEFT;
+                break;
+            case false:
+                direction = Direction.RIGHT;
+                break;
+        }
+
+        renderer.flipX = isDirectionLeft;
 
         transform.Translate(moveVec * MyTime.deltaTime * timeScale * _curSpd);
     }

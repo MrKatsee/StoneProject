@@ -4,12 +4,14 @@ using UnityEngine;
 
 public class Attack : MonoBehaviour
 {
+    public Monster monster;
+
     [SerializeField]
-    private float _damage;
+    protected float _damage;
     [SerializeField]
-    private bool _defendable;
+    public bool _defendable;
     [SerializeField]
-    private float _duration;
+    protected float _duration;
 
     // Start is called before the first frame update
     public virtual void Start()
@@ -28,6 +30,15 @@ public class Attack : MonoBehaviour
         _duration = duration;
         _damage = damage;
         _defendable = defendable;
+    }
+
+    public virtual void Init(float duration, float damage, bool defendable, Monster monster)
+    {
+        _duration = duration;
+        _damage = damage;
+        _defendable = defendable;
+
+        this.monster = monster;
     }
 
     public virtual void OnEnable()
@@ -50,10 +61,6 @@ public class Attack : MonoBehaviour
 
     protected virtual void OnTriggerEnter2D(Collider2D c)
     {
-        if (c.tag == "Player")
-        {
-            c.GetComponent<Player>().GetDamage(_damage);
-            gameObject.SetActive(false);
-        }
+
     }
 }
