@@ -125,7 +125,7 @@ GameObject:
   - component: {fileID: 122851655}
   m_Layer: 9
   m_Name: AttackPrefab(Clone)
-  m_TagString: Untagged
+  m_TagString: MonsterAttack
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -142,7 +142,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c31e4fbd56b3744b932a05bcc9523de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  monster: {fileID: 0}
+  monster: {fileID: 972345272}
   _damage: 0
   _defendable: 1
   _duration: 0.4
@@ -197,6 +197,7 @@ GameObject:
   - component: {fileID: 231901666}
   - component: {fileID: 231901667}
   - component: {fileID: 231901668}
+  - component: {fileID: 231901669}
   m_Layer: 9
   m_Name: Attack1
   m_TagString: Untagged
@@ -228,7 +229,7 @@ BoxCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
@@ -260,6 +261,27 @@ MonoBehaviour:
   _damage: 0
   _defendable: 0
   _duration: 0.2
+--- !u!50 &231901669
+Rigidbody2D:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 231901665}
+  m_BodyType: 0
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDrag: 0
+  m_AngularDrag: 0.05
+  m_GravityScale: 0
+  m_Material: {fileID: 0}
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -554,7 +576,7 @@ GameObject:
   - component: {fileID: 1257495745}
   m_Layer: 9
   m_Name: AttackPrefab(Clone)
-  m_TagString: Untagged
+  m_TagString: MonsterAttack
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -571,7 +593,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c31e4fbd56b3744b932a05bcc9523de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  monster: {fileID: 0}
+  monster: {fileID: 972345272}
   _damage: 0
   _defendable: 1
   _duration: 0.4
@@ -936,7 +958,7 @@ GameObject:
   - component: {fileID: 1656790261}
   m_Layer: 9
   m_Name: AttackPrefab(Clone)
-  m_TagString: Untagged
+  m_TagString: MonsterAttack
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -953,7 +975,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c31e4fbd56b3744b932a05bcc9523de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  monster: {fileID: 0}
+  monster: {fileID: 972345272}
   _damage: 0
   _defendable: 1
   _duration: 0.4

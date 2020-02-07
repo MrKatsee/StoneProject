@@ -88,8 +88,8 @@ public class Pattern : MonoBehaviour
     {
         monster.isPatternPlaying = true;
 
-        yield return new WaitForSeconds(preDelay);
         yield return new WaitUntil(() => monster.timeScale == 1f);
+        yield return new WaitForSeconds(preDelay);
 
         float timer = duration;
 
@@ -100,17 +100,17 @@ public class Pattern : MonoBehaviour
         {
             renderer.sprite = anim.sprite;
 
-            yield return new WaitForSeconds(anim.duration);
             yield return new WaitUntil(() => monster.timeScale == 1f);
+            yield return new WaitForSeconds(anim.duration);
 
             timer -= anim.duration;
         }
 
+        yield return new WaitUntil(() => monster.timeScale == 1f);
         yield return new WaitForSeconds(timer);     //혹시 애니메이션 지속시간이랑 공격 지속 시간이 다를 경우
-        yield return new WaitUntil(() => monster.timeScale == 1f);
 
-        yield return new WaitForSeconds(postDelay);
         yield return new WaitUntil(() => monster.timeScale == 1f);
+        yield return new WaitForSeconds(postDelay);
 
         NextPatternPlay();
         //몬스터에서 Idle로 전환해줘야 함
