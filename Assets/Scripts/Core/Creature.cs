@@ -7,11 +7,15 @@ public enum Direction
     RIGHT, LEFT
 }
 
+public enum CreatureTag
+{
+    CREATURE, MONSTER, PLAYER
+}
+
+
 
 public class Creature : PhysicsAffectableObject
 {
-    [Header("CreatureSetting")]
-    public SpriteRenderer renderer;
 
     [Header("CreatureStatus")]
     protected float _hp = 10f;
@@ -33,6 +37,8 @@ public class Creature : PhysicsAffectableObject
     public Direction direction = Direction.RIGHT;
     public bool movable = true;
 
+    public CreatureTag creatureTag = CreatureTag.CREATURE;
+
     protected virtual void Move(Vector2 moveVec)
     {
         if (!movable) return;
@@ -51,9 +57,9 @@ public class Creature : PhysicsAffectableObject
                 break;
         }
 
-        renderer.flipX = isDirectionLeft;
+        spriteRenderer.flipX = isDirectionLeft;
 
-        transform.Translate(moveVec * MyTime.deltaTime * timeScale * _curSpd);
+        transform.Translate(moveVec * MyTime.deltaTime * TimeScale * _curSpd);
     }
 
     protected virtual void Jump(float vel = 5f)

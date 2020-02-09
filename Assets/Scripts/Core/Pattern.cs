@@ -23,6 +23,12 @@ public class SpriteAnimationEntity
 {
     public Sprite sprite;
     public float duration;
+
+    public SpriteAnimationEntity(Sprite _sprite, float _duration)
+    {
+        sprite = _sprite;
+        duration = _duration;
+    }
 }
 
 public class Pattern : MonoBehaviour
@@ -35,8 +41,6 @@ public class Pattern : MonoBehaviour
     + 넉백?
     + 지속 공격 여부?
      */
-    //공격 명령 - 패턴
-    //공격 판정 - 어택
     public Monster monster;
 
     public Attack attackPrefab;      //투사체 여러 발일 경우 1. 한 패턴으로 처리 2. 여러 패턴으로 처리
@@ -50,10 +54,12 @@ public class Pattern : MonoBehaviour
     public Vector2 attackOffset;    //오른쪽 방향을 기준으로 한다
     public float damage;
 
-
+    public Sprite preDelaySprite;
 
     [SerializeField]
     public List<SpriteAnimationEntity> spriteAnimation;
+
+    public Sprite postDelaySprite;
 
     public Pattern nextPattern;
     public PatternSpawnType nextPatternType; //다음 패턴 공격 판정이 어디서 생길지
@@ -86,30 +92,42 @@ public class Pattern : MonoBehaviour
 
     private IEnumerator PatternRoutine()
     {
+        SpriteRenderer renderer = monster.GetComponent<SpriteRenderer>();
+
         monster.isPatternPlaying = true;
 
-        yield return new WaitUntil(() => monster.timeScale == 1f);
+        //선딜레이, 후딜레이 모션을 스프라이트 하나로 퉁치지 말고 애니메이션으로 구현해도 될듯
+        if (preDelaySprite != null)
+        {
+            renderer.sprite = preDelaySprite;
+        }
+
+        yield return new WaitUntil(() => monster.TimeScale == 1f);
         yield return new WaitForSeconds(preDelay);
 
         float timer = duration;
 
         attackPrefab.gameObject.SetActive(true);
 
-        SpriteRenderer renderer = monster.GetComponent<SpriteRenderer>();
         foreach (var anim in spriteAnimation)
         {
             renderer.sprite = anim.sprite;
 
-            yield return new WaitUntil(() => monster.timeScale == 1f);
+            yield return new WaitUntil(() => monster.TimeScale == 1f);
             yield return new WaitForSeconds(anim.duration);
 
             timer -= anim.duration;
         }
 
-        yield return new WaitUntil(() => monster.timeScale == 1f);
+        yield return new WaitUntil(() => monster.TimeScale == 1f);
         yield return new WaitForSeconds(timer);     //혹시 애니메이션 지속시간이랑 공격 지속 시간이 다를 경우
 
-        yield return new WaitUntil(() => monster.timeScale == 1f);
+        if (postDelaySprite != null)
+        {
+            renderer.sprite = postDelaySprite;
+        }
+
+        yield return new WaitUntil(() => monster.TimeScale == 1f);
         yield return new WaitForSeconds(postDelay);
 
         NextPatternPlay();
@@ -159,7 +177,7 @@ public class PatternEditor : Editor
             attack.transform.localScale = pattern.attackSize;
 
             pattern.attackPrefab = attack;
-            pattern.attackPrefab.Init(pattern.duration, pattern.damage, pattern.defendable);
+            pattern.attackPrefab.Init(pattern.duration, pattern.damage, pattern.defendable, pattern.monster);
         }
     }
 }

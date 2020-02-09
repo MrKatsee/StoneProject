@@ -9,9 +9,18 @@ public class Monster : Creature
 
     public bool isPatternPlaying = false;
 
-    //임시
-    private void Update()
+    protected override void Start()
     {
+        base.Start();
+
+        creatureTag = CreatureTag.MONSTER;
+    }
+
+    //임시
+    protected override void Update()
+    {
+        base.Update();
+
         if (!isPatternPlaying)
         {
             StartCoroutine(Routine());

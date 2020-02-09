@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class PhysicsAffectableObject : MonoBehaviour
 {
+
     //모든 물리 연산이 아닌, Y축 물리 연산만 담당한다.
     //대표적으로 점프, 낙하
     //Vector2로 하는 건 혹시 모르니까
@@ -17,7 +18,27 @@ public class PhysicsAffectableObject : MonoBehaviour
     [Header("Physics")]
     public float gravityScale = 1f;
     public Vector2 velocity = Vector2.zero;
-    public float timeScale = 1f;
+    private float timeScale = 1f;
+    public float TimeScale
+    {
+        get { return timeScale; }
+        set
+        {
+            timeScale = value;
+
+            if (timeScale == 0f)
+            {
+                stunRendererRoutine = StartCoroutine(StunRendererRoutine());
+            }
+            else if (TimeScale == 1f)
+            {
+                StopStunRendererRoutine();
+            }
+        }
+    }
+
+    [Header("CreatureSetting")]
+    public SpriteRenderer spriteRenderer;
 
     public void AddStun(float time)
     {
@@ -29,11 +50,59 @@ public class PhysicsAffectableObject : MonoBehaviour
     Coroutine stunRoutine;
     private IEnumerator StunRoutine(float time)
     {
-        timeScale = 0f;
+        TimeScale = 0f;
 
         yield return new WaitForSeconds(time);
 
-        timeScale = 1f;
+        TimeScale = 1f;
+    }
+
+
+    private float alpha_end = 1f;
+    private float alpha_start = 0.5f;
+
+    private float halfDuration = 0.2f;
+    //임시
+    Coroutine stunRendererRoutine;
+    private IEnumerator StunRendererRoutine()
+    {
+        Debug.Log("debug");
+
+        float timer = 0f;
+
+        Color originalColor = spriteRenderer.color;
+
+
+        while(true)
+        {
+            while (timer <= halfDuration)
+            {
+                Debug.Log(Mathf.Lerp(alpha_end, alpha_start, timer / halfDuration));
+
+                float alpha = Mathf.Lerp(alpha_end, alpha_start, timer / halfDuration);
+                spriteRenderer.color = new Color(alpha, alpha, alpha);
+
+                timer += Time.deltaTime;
+                yield return null;
+            }
+            while (timer >= 0f)
+            {
+                Debug.Log(Mathf.Lerp(alpha_end, alpha_start, timer / halfDuration));
+
+                float alpha = Mathf.Lerp(alpha_end, alpha_start, timer / halfDuration);
+                spriteRenderer.color = new Color(alpha, alpha, alpha);
+
+                timer -= Time.deltaTime;
+                yield return null;
+            }
+        }
+    }
+
+    private void StopStunRendererRoutine()
+    {
+        StopCoroutine(stunRendererRoutine);
+
+        spriteRenderer.color = new Color(alpha_end, alpha_end, alpha_end);
     }
 
     public void AddVelocity(Vector2 v)
@@ -43,7 +112,7 @@ public class PhysicsAffectableObject : MonoBehaviour
 
     private void YAxisMove()
     {
-        Vector2 moveVec = (velocity + (_gravity * gravityScale * MyTime.deltaTime * timeScale)) * MyTime.deltaTime;
+        Vector2 moveVec = (velocity + (_gravity * gravityScale * MyTime.deltaTime * TimeScale)) * MyTime.deltaTime;
         bool? checkResult = YAxisCollisionCheck();
         if (checkResult == true)
         {
@@ -61,7 +130,7 @@ public class PhysicsAffectableObject : MonoBehaviour
                 return;
             }
         }
-        velocity += _gravity * gravityScale * MyTime.deltaTime * timeScale;
+        velocity += _gravity * gravityScale * MyTime.deltaTime * TimeScale;
         transform.Translate(moveVec);
     }
 
@@ -120,6 +189,8 @@ public class PhysicsAffectableObject : MonoBehaviour
         gameObject.layer = LayerMask.NameToLayer("PhysicalAffectable");
 
         _physicsAvailable = true;
+
+        spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     protected virtual void Start()
