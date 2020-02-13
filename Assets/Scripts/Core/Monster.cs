@@ -14,6 +14,8 @@ public class Monster : Creature
         base.Start();
 
         creatureTag = CreatureTag.MONSTER;
+
+        StartCoroutine(PatrolRoutine());
     }
 
     //임시
@@ -21,18 +23,56 @@ public class Monster : Creature
     {
         base.Update();
 
+        /* 공격 테스트용
         if (!isPatternPlaying)
         {
             StartCoroutine(Routine());
         }
+        */
     }
 
     //임시
+    /* 공격 테스트용
     IEnumerator Routine()
     {
         patterns[0].PatternPlay();
 
         yield return new WaitUntil(() => !isPatternPlaying);
+    }*/
+
+    IEnumerator PatrolRoutine()
+    {
+        float timer = 0f;
+
+
+        while (timer <= 1f)
+        {
+            Move(Vector2.left);
+
+            timer += Time.deltaTime;
+            yield return null;
+        }
+        timer = 0f;
+
+        while (timer <= 1f)
+        {
+            Move(Vector2.right);
+
+            timer += Time.deltaTime;
+            yield return null;
+        }
+        timer = 0f;
+
+        while (timer <= 1f)
+        {
+            Move(Vector2.zero);
+
+            timer += Time.deltaTime;
+            yield return null;
+        }
+        timer = 0f;
+
+        StartCoroutine(PatrolRoutine());
     }
 }
 

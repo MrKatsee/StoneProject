@@ -68,7 +68,12 @@ public class Player : Creature
 
     private void Attack()
     {
-        if (Input.GetKey(KeyCode.A)) Attack1();
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+            animationStatus = AnimationStatus.ATTACK;
+
+            Attack1();
+        }
     }
 
     private void Init_Player()
@@ -78,8 +83,7 @@ public class Player : Creature
         attack1Prefab.Init(attack1_duration, attack1_damage, false, this);
     }
 
-    [SerializeField]
-    public List<SpriteAnimationEntity> idle_spriteAnimation;
+
 
     [Header("AttackSetting")]
     public Attack attack1Prefab;
@@ -133,12 +137,10 @@ public class Player : Creature
             attack1Routine = null;
         }
 
+        animationStatus = AnimationStatus.NONE;
+
         attack1Prefab.gameObject.SetActive(false);
         isAttacking = false;
-
-        //idle 애니메이션으로 넘어가게 바꿔야함
-        SpriteRenderer renderer = GetComponent<SpriteRenderer>();
-        renderer.sprite = idle_spriteAnimation[0].sprite;
     }
 
     protected override void Start()
@@ -159,6 +161,7 @@ public class Player : Creature
         Dash();
 
         if (isAttacking) return;
+
         Attack();
     }
 
