@@ -147,6 +147,12 @@ MonoBehaviour:
   velocity: {x: 0, y: 0}
   spriteRenderer: {fileID: 0}
   _floorCollider: {fileID: 0}
+  _hp: 10
+  _atk: 1
+  _spd: 3
+  _curHp: 0
+  _curAtk: 0
+  _curSpd: 0
   direction: 0
   movable: 1
   creatureTag: 0
@@ -164,6 +170,7 @@ MonoBehaviour:
     duration: 0.25
   - sprite: {fileID: 21300010, guid: 80a1755582c486f45aef3d95636fc946, type: 3}
     duration: 0.25
+  animationStatus: 0
   patterns: []
   isPatternPlaying: 0
 --- !u!212 &163460687
@@ -482,13 +489,22 @@ MonoBehaviour:
   velocity: {x: 0, y: 0}
   spriteRenderer: {fileID: 0}
   _floorCollider: {fileID: 0}
+  _hp: 10
+  _atk: 1
+  _spd: 3
+  _curHp: 0
+  _curAtk: 0
+  _curSpd: 0
   direction: 0
   movable: 1
   creatureTag: 0
   idle_spriteAnimation:
   - sprite: {fileID: 21300008, guid: e738624fcf60a58439eab01534e44cd3, type: 3}
     duration: 0
-  move_spriteAnimation: []
+  move_spriteAnimation:
+  - sprite: {fileID: 21300014, guid: e738624fcf60a58439eab01534e44cd3, type: 3}
+    duration: 0
+  animationStatus: 0
   attack1Prefab: {fileID: 231901668}
   attack1_spriteAnimation:
   - sprite: {fileID: 21300000, guid: e738624fcf60a58439eab01534e44cd3, type: 3}

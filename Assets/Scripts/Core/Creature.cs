@@ -82,6 +82,7 @@ public class Creature : PhysicsAffectableObject
         transform.Translate(moveVec * MyTime.deltaTime * TimeScale * _curSpd);
     }
 
+    [SerializeField]
     protected AnimationStatus animationStatus = AnimationStatus.NONE;
 
     private Coroutine animationRoutine;

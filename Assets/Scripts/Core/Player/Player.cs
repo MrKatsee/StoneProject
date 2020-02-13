@@ -83,8 +83,6 @@ public class Player : Creature
         attack1Prefab.Init(attack1_duration, attack1_damage, false, this);
     }
 
-
-
     [Header("AttackSetting")]
     public Attack attack1Prefab;
 
