@@ -60,12 +60,14 @@ public class Pattern : MonoBehaviour
     public float damage;
     public Vector2 attackDashVelocity;
 
-    public Sprite preDelaySprite;
+    [SerializeField]
+    public List<SpriteAnimationEntity> preDelaySpriteAnimation;
 
     [SerializeField]
     public List<SpriteAnimationEntity> spriteAnimation;
 
-    public Sprite postDelaySprite;
+    [SerializeField]
+    public List<SpriteAnimationEntity> postDelaySpriteAnimation;
 
     public Pattern nextPattern;
     public PatternSpawnType nextPatternType; //다음 패턴 공격 판정이 어디서 생길지
@@ -103,24 +105,35 @@ public class Pattern : MonoBehaviour
 
     private IEnumerator PatternRoutine()
     {
+
         attackPreparationPrefab.gameObject.SetActive(false);
 
         SpriteRenderer renderer = monster.GetComponent<SpriteRenderer>();
 
         monster.isPatternPlaying = true;
 
-        //선딜레이, 후딜레이 모션을 스프라이트 하나로 퉁치지 말고 애니메이션으로 구현해도 될듯
-        if (preDelaySprite != null)
+        float timer = 0f;
+        if (preDelaySpriteAnimation != null)
         {
-            renderer.sprite = preDelaySprite;
-        }
+            timer = preDelay;
 
-        yield return new WaitUntil(() => monster.TimeScale == 1f);
-        yield return new WaitForSeconds(preDelay);
+            foreach (var anim in preDelaySpriteAnimation)
+            {
+                renderer.sprite = anim.sprite;
+
+                yield return new WaitUntil(() => monster.TimeScale == 1f);
+                yield return new WaitForSeconds(anim.duration);
+
+                timer -= anim.duration;
+            }
+
+            yield return new WaitUntil(() => monster.TimeScale == 1f);
+            yield return new WaitForSeconds(timer);    
+        }
 
         monster.AddVelocity(attackDashVelocity);
 
-        float timer = duration;
+        timer = duration;
 
         attackPrefab.gameObject.SetActive(true);        
 
@@ -137,13 +150,23 @@ public class Pattern : MonoBehaviour
         yield return new WaitUntil(() => monster.TimeScale == 1f);
         yield return new WaitForSeconds(timer);     //혹시 애니메이션 지속시간이랑 공격 지속 시간이 다를 경우
 
-        if (postDelaySprite != null)
+        if (postDelaySpriteAnimation != null)
         {
-            renderer.sprite = postDelaySprite;
-        }
+            timer = postDelay;
 
-        yield return new WaitUntil(() => monster.TimeScale == 1f);
-        yield return new WaitForSeconds(postDelay);
+            foreach (var anim in postDelaySpriteAnimation)
+            {
+                renderer.sprite = anim.sprite;
+
+                yield return new WaitUntil(() => monster.TimeScale == 1f);
+                yield return new WaitForSeconds(anim.duration);
+
+                timer -= anim.duration;
+            }
+
+            yield return new WaitUntil(() => monster.TimeScale == 1f);
+            yield return new WaitForSeconds(timer);     
+        }
 
         NextPatternPlay();
 
