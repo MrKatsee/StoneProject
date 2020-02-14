@@ -15,7 +15,24 @@ public class Monster : Creature
 
         creatureTag = CreatureTag.MONSTER;
 
-        StartCoroutine(PatrolRoutine());
+        //StartCoroutine(PatrolRoutine());
+    }
+
+    public void Attack(int index)
+    {
+        StartCoroutine(AttackRoutine(index));
+    }
+
+    private IEnumerator AttackRoutine(int index)
+    {
+        isPatternPlaying = true;
+        animationStatus = AnimationStatus.ATTACK;
+
+        patterns[index].PatternPlay();
+
+        yield return new WaitUntil(() => isPatternPlaying);
+
+        animationStatus = AnimationStatus.NONE;
     }
 
     //임시
@@ -114,6 +131,7 @@ public class MonsterEditor : Editor
             {
                 foreach (var p in monster.patterns)
                 {
+                    p.patternIndex = c - 1;
                     p.gameObject.name = $"Pattern_{c++}";
                 }
             }
@@ -122,6 +140,7 @@ public class MonsterEditor : Editor
             }
 
             pattern = new GameObject("Pattern_" + c).AddComponent<Pattern>();
+            pattern.patternIndex = c - 1;
             pattern.transform.parent = monster.transform;
             pattern.transform.position = monster.transform.position;
             pattern.monster = monster;

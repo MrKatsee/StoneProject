@@ -43,7 +43,10 @@ public class Pattern : MonoBehaviour
      */
     public Monster monster;
 
+    public int patternIndex;
+
     public Attack attackPrefab;      //투사체 여러 발일 경우 1. 한 패턴으로 처리 2. 여러 패턴으로 처리
+    public AttackPreparation attackPreparationPrefab;
     public AttackType attackType;
     //public ShootType shootType;     //지금 문제 있음 (밀리 시에도 보임)
     public bool defendable;
@@ -52,7 +55,10 @@ public class Pattern : MonoBehaviour
     public float duration;
     public Vector2 attackSize;
     public Vector2 attackOffset;    //오른쪽 방향을 기준으로 한다
+    public Vector2 attackPreparationSize;
+    public Vector2 attackPreparationOffset;
     public float damage;
+    public Vector2 attackDashVelocity;
 
     public Sprite preDelaySprite;
 
@@ -64,6 +70,9 @@ public class Pattern : MonoBehaviour
     public Pattern nextPattern;
     public PatternSpawnType nextPatternType; //다음 패턴 공격 판정이 어디서 생길지
 
+    [TextArea(1, 5)]
+    public string debugText;
+
     private void OnEnable()
     {
         attackPrefab.gameObject.SetActive(false);
@@ -71,6 +80,8 @@ public class Pattern : MonoBehaviour
 
     public void PatternPlay()
     {
+        Debug.Log(debugText);
+
         //일단 지금은 무조건 몬스터 기준으로 생성
         Vector2 monsterPos = monster.transform.position;
         Vector2 offset = Vector2.zero;
@@ -92,6 +103,8 @@ public class Pattern : MonoBehaviour
 
     private IEnumerator PatternRoutine()
     {
+        attackPreparationPrefab.gameObject.SetActive(false);
+
         SpriteRenderer renderer = monster.GetComponent<SpriteRenderer>();
 
         monster.isPatternPlaying = true;
@@ -105,9 +118,11 @@ public class Pattern : MonoBehaviour
         yield return new WaitUntil(() => monster.TimeScale == 1f);
         yield return new WaitForSeconds(preDelay);
 
+        monster.AddVelocity(attackDashVelocity);
+
         float timer = duration;
 
-        attackPrefab.gameObject.SetActive(true);
+        attackPrefab.gameObject.SetActive(true);        
 
         foreach (var anim in spriteAnimation)
         {
@@ -131,7 +146,8 @@ public class Pattern : MonoBehaviour
         yield return new WaitForSeconds(postDelay);
 
         NextPatternPlay();
-        //몬스터에서 Idle로 전환해줘야 함
+
+        attackPreparationPrefab.gameObject.SetActive(true);
     }
 
     private void NextPatternPlay()
@@ -166,6 +182,9 @@ public class PatternEditor : Editor
             if (pattern.attackPrefab != null)
                 DestroyImmediate(pattern.attackPrefab.gameObject);
 
+            if (pattern.attackPreparationPrefab != null)
+                DestroyImmediate(pattern.attackPreparationPrefab.gameObject);
+
             GameObject prefab = null;
             if (pattern.attackType == AttackType.Melee)
             {
@@ -178,6 +197,18 @@ public class PatternEditor : Editor
 
             pattern.attackPrefab = attack;
             pattern.attackPrefab.Init(pattern.duration, pattern.damage, pattern.defendable, pattern.monster);
+
+            if (pattern.attackPreparationSize == Vector2.zero)
+                return;
+
+            prefab = Resources.Load("Prefabs/AttackPreperationPrefab") as GameObject;
+            AttackPreparation preparation = Instantiate(prefab).GetComponent<AttackPreparation>();
+            preparation.transform.parent = pattern.transform;
+            preparation.transform.position = pattern.transform.position + (Vector3)pattern.attackPreparationOffset;
+            preparation.transform.localScale = pattern.attackPreparationSize;
+
+            pattern.attackPreparationPrefab = preparation;
+            pattern.attackPreparationPrefab.Init(pattern.monster, pattern);
         }
     }
 }

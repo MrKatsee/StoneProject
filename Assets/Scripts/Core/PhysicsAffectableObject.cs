@@ -12,8 +12,10 @@ public class PhysicsAffectableObject : MonoBehaviour
 
     private Collider2D _col;
     private Vector2 _colSize;
+    private Vector2 _colOffset;
 
     private static Vector2 _gravity = new Vector2(0f, -9.8f);
+    private static float frictionalForce = 10f;      //마찰력
 
     [Header("Physics")]
     public float gravityScale = 1f;
@@ -118,7 +120,7 @@ public class PhysicsAffectableObject : MonoBehaviour
         {
             if (moveVec.y < 0f)
             {
-                velocity = Vector2.zero;
+                velocity = new Vector2(velocity.x, 0f);
                 return;
             }
         }
@@ -126,11 +128,42 @@ public class PhysicsAffectableObject : MonoBehaviour
         {
             if (moveVec.y > 0f)
             {
-                velocity = Vector2.zero;
+                velocity = new Vector2(velocity.x, 0f);
                 return;
             }
         }
         velocity += _gravity * gravityScale * MyTime.deltaTime * TimeScale;
+        transform.Translate(moveVec);
+    }
+
+    private void XAxixMove()
+    {
+        if (velocity.x == 0f) return;
+
+        Vector2 moveVec = new Vector2(velocity.x - frictionalForce * MyTime.deltaTime * TimeScale, 0f) * MyTime.deltaTime;
+
+        bool? checkResult = YAxisCollisionCheck();
+
+        //바닥일 경우 마찰력 적용
+        if (checkResult == true)
+        {
+            bool isMinus = false;
+
+            float x_vel_power = velocity.x;
+            if (x_vel_power < 0f)
+            {
+                x_vel_power *= -1f;
+                isMinus = true;
+            }
+
+            x_vel_power -= frictionalForce * MyTime.deltaTime * TimeScale;
+
+            if (x_vel_power <= 0f) x_vel_power = 0f;
+            if (isMinus) x_vel_power *= 1f;
+
+            velocity = new Vector2(x_vel_power, velocity.y);
+        }
+
         transform.Translate(moveVec);
     }
 
@@ -152,7 +185,7 @@ public class PhysicsAffectableObject : MonoBehaviour
                 return true;
         }
         */
-        float distance = _colSize.y * 0.5f;
+        float distance = _colSize.y * 0.5f - _colOffset.y;
 
         Vector2 dir = Vector2.down;
         RaycastHit2D hit = Physics2D.Raycast(transform.position, dir, distance, _layerMask);
@@ -184,6 +217,7 @@ public class PhysicsAffectableObject : MonoBehaviour
 
         _col = GetComponent<Collider2D>();
         _colSize = _col.bounds.size;
+        _colOffset = _col.offset;
 
         _layerMask = ~(1 << LayerMask.NameToLayer("PhysicalAffectable") | 1 << LayerMask.NameToLayer("NonPhysicalAffectable"));
         gameObject.layer = LayerMask.NameToLayer("PhysicalAffectable");
@@ -202,6 +236,9 @@ public class PhysicsAffectableObject : MonoBehaviour
     protected virtual void Update()
     {
         if (_physicsAvailable)
+        {
+            XAxixMove();
             YAxisMove();
+        }
     }
 }

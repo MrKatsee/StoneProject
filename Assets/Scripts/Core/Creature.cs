@@ -118,7 +118,6 @@ public class Creature : PhysicsAffectableObject
         foreach (var anim in animation)
         {
             if (creatureTag == CreatureTag.PLAYER)
-                Debug.Log($"Count {count++}");
 
             spriteRenderer.sprite = anim.sprite;
 
@@ -148,8 +147,6 @@ public class Creature : PhysicsAffectableObject
     {
         base.Update();
 
-        if (creatureTag == CreatureTag.PLAYER)
-        Debug.Log(animationStatus);
     }
 
     public override void Init()
