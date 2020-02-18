@@ -6,6 +6,7 @@ TagManager:
   tags:
   - MonsterAttack
   - Attack
+  - FxTemporaire
   layers:
   - Default
   - TransparentFX
@@ -42,4 +43,13 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: 1
+    uniqueID: 1400539135
+    locked: 0
+  - name: 2
+    uniqueID: 1486020823
+    locked: 0
+  - name: 3
+    uniqueID: 3877457763
     locked: 0
